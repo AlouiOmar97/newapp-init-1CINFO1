@@ -11,6 +11,8 @@
   "description": "",
   "dependencies": {
     "express": "^5.1.0",
-    "twig": "^1.17.1"
+    "mongoose": "^8.16.1",
+    "twig": "^1.17.1",
+    "yup": "^1.6.1"
   }
 }
