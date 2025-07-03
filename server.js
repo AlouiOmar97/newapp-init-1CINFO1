@@ -7,6 +7,7 @@ const productsController = require('./Controllers/productsController')
 const chatController = require('./Controllers/chatController')
 const config = require('./Config/db.json')
 const mongoose = require('mongoose')
+const { socketIO } = require('./Services/chatService')
 
 app.set('views', path.join(__dirname, 'Views'))
 app.set('view engine', 'twig')
@@ -25,6 +26,7 @@ mongoose.connect(config.mongoDB.uri)
             console.log('Connection to DB failed : '+ error)
         })
 const server = http.createServer(app)
+const io = socketIO(server)
 server.listen(3000, ()=>{
     console.log('Server started on 3000 !');
 })

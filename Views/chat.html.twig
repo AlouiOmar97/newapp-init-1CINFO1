@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Page</title>
+</head>
+<body>
+    <script src="/socket.io/socket.io.js"></script>
+    <h1>Chat</h1>
+    <label for="msg">Message :</label>
+    <input type="text" id="msg" onkeydown="isTyping()">
+    <input type="submit" onclick="sendMsg()">
+    <script>
+        name = prompt('Type your name !')
+        socket = io.connect()
+        socket.on('msg', (data)=>{
+            var p = document.createElement('p') // <p></p>
+            p.innerHTML = data  // <p> data </p>
+            document.body.append(p) // add p to body as the last element
+        })
+
+        socket.on('allMsgs', (data)=>{
+            console.log(data)
+            for(i=0; i< data.length; i++){
+                var p = document.createElement('p') // <p></p>
+                p.innerHTML = data[i].name + ' : '+ data[i].content  // <p> data </p>
+                document.body.append(p) // add p to body as the last element
+            }
+        })
+
+        function sendMsg(){
+            var msg = document.getElementById('msg').value
+            data= {
+                name,
+                msg
+            }
+            console.log(data)
+            socket.emit('sendMsg', data)
+        }
+
+        function isTyping(){
+            data = {
+                name,
+                "msg" : "is typing ..."
+            }
+            console.log(data)
+            socket.emit('isTyping', data)
+        }
+    </script>
+</body>
+</html>

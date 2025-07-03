@@ -1,8 +1,10 @@
 const Chat = require('../Models/chatModel')
+const socketIo = require('socket.io')
 
 const createChat =async (req, res, next)=>{
     await new Chat({
         content: req.body.content,
+        name: req.body.name,
         creationDate: new Date()
     }).save()
     .then((data, err)=>{
@@ -53,4 +55,31 @@ const deleteChat =async (req, res, next)=>{
     })
 }
 
-module.exports = { createChat, readOneChat, readAllChats, updateChat, deleteChat }
+const showChat = (req, res, next)=>{
+    res.render('chat.html.twig')
+}
+
+function socketIO(server){
+    const io = socketIo(server);
+    io.on("connection",async (socket)=>{
+        console.log('A new user is connected with socket id: '+ socket.id)
+        socket.broadcast.emit('msg', 'A new user is connected !'+ socket.id)
+        const msgs = await Chat.find()
+        io.emit('allMsgs', msgs)
+        socket.on('sendMsg',async (data)=>{
+            console.log(data)
+            io.emit('msg', data.name + " : " + data.msg)
+            await new Chat({
+                content: data.msg,
+                name: data.name,
+                creationDate: new Date()
+            }).save()
+        })
+        socket.on('isTyping', (data)=>{
+            socket.broadcast.emit('msg', data.name + ' ' + data.msg)
+        })
+    })
+    return io;
+}
+
+module.exports = { createChat, readOneChat, readAllChats, updateChat, deleteChat, showChat, socketIO }
