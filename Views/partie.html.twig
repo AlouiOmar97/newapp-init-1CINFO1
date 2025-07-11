@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partie Page</title>
+</head>
+<body>
+    <script src="/socket.io/socket.io.js"></script>
+    <h1>Partie</h1>
+    <label for="partie">Nom Partie :</label>
+    <input type="text"  id="partie"><br>
+    <label for="j1">ID Joueur 1 :</label>
+    <input type="text"  id="j1"><br>
+    <label for="j2">ID Joueur 2 :</label>
+    <input type="text"  id="j2"><br>
+    <input type="submit" onclick="sendPartie()">
+    <button  onclick="afficherStat()">Afficher Stat</button>
+    <script>
+        //name = prompt('Type your name !')
+        socket = io.connect()
+        socket.on('showStats', (data)=>{
+            console.log(data)
+            var p1 = document.createElement('p') // <p></p>
+            p1.innerHTML = "Stats:<br> Nom Partie: "+data.partie  // <p> data </p>
+            document.body.append(p1) // add p to body as the last element
+
+            var j1 = document.createElement('p') // <p></p>
+            j1.innerHTML = "Nom Joueur 1: "+ data.j1.pseudo + "<br> Score: " + data.j1.score+ "<br> Santé: " + data.j1.sante // <p> data </p>
+            document.body.append(j1)
+
+            var j2 = document.createElement('p') // <p></p>
+            j2.innerHTML = "Nom Joueur 1: "+ data.j2.pseudo + "<br> Score: " + data.j2.score+ "<br> Santé: " + data.j2.sante // <p> data </p>
+            document.body.append(j2)
+            
+        })
+
+        socket.on('msg', (data)=>{
+            var p = document.createElement('p') // <p></p>
+            p.innerHTML = data  // <p> data </p>
+            document.body.append(p) // add p to body as the last element
+        })
+
+        socket.on('allMsgs', (data)=>{
+            console.log(data)
+            for(i=0; i< data.length; i++){
+                var p = document.createElement('p') // <p></p>
+                p.innerHTML = data[i].name + ' : '+ data[i].content  // <p> data </p>
+                document.body.append(p) // add p to body as the last element
+            }
+        })
+
+        function afficherStat(){
+            var partie = document.getElementById('partie').value
+            var j1 = document.getElementById('j1').value
+            var j2 = document.getElementById('j2').value
+            data= {
+                partie,
+                j1,
+                j2
+            }
+            socket.emit('afficherStat', data)
+        }
+
+        function sendPartie(){
+            var partie = document.getElementById('partie').value
+            var j1 = document.getElementById('j1').value
+            var j2 = document.getElementById('j2').value
+            data= {
+                partie,
+                j1,
+                j2
+            }
+            console.log(data)
+            socket.emit('sendPartie', data)
+        }
+
+        function isTyping(){
+            data = {
+                name,
+                "msg" : "is typing ..."
+            }
+            console.log(data)
+            socket.emit('isTyping', data)
+        }
+    </script>
+</body>
+</html>
